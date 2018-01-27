@@ -10,12 +10,10 @@ from tts import *
 from get_tts import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-WAITING = False
-TYPE=None
-BEATFNAME='bfree'
 bio = BytesIO()
 
+
+WAITING = False
 TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -27,7 +25,8 @@ def echo(bot, update):
     splited_text = update.message.text.lower()
     print "MSG"
     chat_id = update.message.chat.id
-    if (WAITING):
+    print TELEGRAM_TOKEN,WAITING
+    if WAITING:
         if(TYPE=='easy'):
             words = splited_text = update.message.text.lower().split(' ')
             if (len(words)!=5):
@@ -75,6 +74,10 @@ def vanilia_gen(bot,update):
     TYPE='easy'
 
 def main():
+    WAITING=False
+    TYPE=None
+    BEATFNAME='bfree'
+
     updater = Updater(TELEGRAM_TOKEN)
 
     dp = updater.dispatcher
