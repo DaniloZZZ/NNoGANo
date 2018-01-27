@@ -11,13 +11,6 @@ import sox
 from optparse import OptionParser
 
 from settings import *
-parser = OptionParser()
-
-(options, args) = parser.parse_args()
-BEATFNAME = args[0]
-
-words= json.load(open('lyrics.json'))
-wavs = [w+".wav" for w in words]
 
 def fft_pow(name,low_pass=False):
     # Define FFT params:-------------------------------------------------------
@@ -101,7 +94,15 @@ def place_words(words,beat_filename,times):
     result = beat.overlay(result)
     result.export("result.wav", format="wav")
     return result
-P,t = fft_pow(BEATFNAME,low_pass=True)
-tms = mark_beats(P,t)
-place_words(words,BEATFNAME,tms)
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    (options, args) = parser.parse_args()
+    BEATFNAME = args[0]
+    parser = OptionParser()
+    words= json.load(open('lyrics.json'))
+    wavs = [w+".wav" for w in words]
+    P,t = fft_pow(BEATFNAME,low_pass=True)
+    tms = mark_beats(P,t)
+    place_words(words,BEATFNAME,tms)
 
