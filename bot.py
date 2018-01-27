@@ -31,7 +31,7 @@ def echo(bot, update):
         if(TYPE=='easy'):
             words = splited_text = update.message.text.lower().split(' ')
             if (len(words)!=5):
-                update.message.reply_text(u"давай пяток слов с иежду ними пробелы")
+                update.message.reply_text(u"давай пяток слов и между ними пробелы")
             else:
                 print "Opening lyrics file. words: %s,id%i"%(words,chat_id)
                 #lyr = open('lyrics_'+chat_id+'.txt','w+')
