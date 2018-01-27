@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from gtts import gTTS
 from pydub import AudioSegment
+import matplotlib.pyplot as plt
+from scipy.io import wavfile as wav
+from scipy.fftpack import fft
 import sox
 
 words = [u"Эй",u"клач",u"плач", u"мурзач"]
@@ -15,6 +18,14 @@ def save_tts(words):
         waud = AudioSegment.from_mp3(w+'.mp3')
         waud.export(w+".wav", format="wav")
 
+def fft_beat(name):
+    rate, data = wav.read('bells.wav')
+    fft_out = fft(data)
+    %matplotlib inline
+    plt.plot(data, np.abs(fft_out))
+    plt.show()
+
+fft_beat('beat')
 # create combiner
 cbn = sox.Combiner()
 # pitch shift combined audio up 3 semitones
