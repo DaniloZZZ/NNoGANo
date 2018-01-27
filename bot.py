@@ -23,6 +23,22 @@ def echo(bot, update):
     message = bot.send_audio(audio=open('result.wav'),
 			     chat_id=chat_id)
 
+RESPONSES = {
+    "Hello": ["Hi there!", "Hi!", "Welcome!", "Hello, {name}!"],
+    "Hi there": ["Hello!", "Hello, {name}!", "Hi!", "Welcome!"],
+    "Hi!": ["Hi there!", "Hello, {name}!", "Welcome!", "Hello!"],
+    "Welcome": ["Hi there!", "Hi!", "Hello!", "Hello, {name}!",],
+}
+def human_response(message):
+    leven = fuzzywuzzy.process.extract(message.get("text", ""), RESPONSES.keys(), limit=1)[0]
+    response = {'chat_id': message['chat']['id']}
+    if leven[1] < 75:
+        response['text'] = "I can not understand you"
+    else:
+        response['text'] = random.choice(RESPONSES.get(leven[0])).format_map(
+            {'name': message["from"].get("first_name", "")}
+        )
+    return response
 
 def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
