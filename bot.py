@@ -13,8 +13,8 @@ sys.setdefaultencoding('utf-8')
 bio = BytesIO()
 
 
-WAITING = False
 TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
+WAITING = False
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -25,7 +25,8 @@ def echo(bot, update):
     splited_text = update.message.text.lower()
     print "MSG"
     chat_id = update.message.chat.id
-    print TELEGRAM_TOKEN,WAITING
+    WAITING=True
+    TYPE='easy'
     if WAITING:
         if(TYPE=='easy'):
             words = splited_text = update.message.text.lower().split(' ')
@@ -36,13 +37,16 @@ def echo(bot, update):
                 #lyr = open('lyrics_'+chat_id+'.txt','w+')
                 c=[]
                 for i in range(5):
-                    c+=words[i]*5
+                    c+=[words[i]]*5
+                print c
                     #for j in range(5):
                         #lyr.write(' '+words[i])
                 #lyr.close()
                 save_tts(c)
+                effects(c)
                 words= json.load(open('lyrics.json'))
                 wavs = [w+".wav" for w in words]
+                BEATFNAME='bfree'
                 P,t = fft_pow(BEATFNAME,low_pass=True)
                 tms = mark_beats(P,t)
                 place_words(c,BEATFNAME,tms)

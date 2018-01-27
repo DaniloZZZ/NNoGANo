@@ -82,6 +82,7 @@ def place_words(words,beat_filename,times):
             sl = AudioSegment.silent((times[idx]-tidx-emph)*1000)
             waud = AudioSegment.from_wav(WAV_DIR+w+".wav")
         except IOError :
+            print "IOErr: file ",WAV_DIR+w+'.wav'
             continue
         print "placing word %s at %f idx:%i. word dur:%f"%(w,times[idx],idx,waud.duration_seconds)
         result+=sl+waud
