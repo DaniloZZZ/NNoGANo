@@ -64,7 +64,7 @@ def mark_beats(P,t):
     #hist,brd = np.histogram(P,bins=range(7))
     #plt.hist(P)
     #plt.show()
-    thr = max(P)*0.9
+    thr = max(P)*0.8
     print "Power threshhold:",thr
     plt.figure(figsize=(20,10))
     plt.plot(t,P)

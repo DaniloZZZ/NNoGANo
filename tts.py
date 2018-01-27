@@ -21,6 +21,7 @@ words= json.load(open('lyrics.json'))
 
 words = json.loads(json.dumps(words))
 #print [w.encode('utf-8') for w in words]
+words=[w for w in words if len(w)>0]
 
 wavs = [w+".wav" for w in words]
 
@@ -32,13 +33,22 @@ def save_tts(words):
         tts = gTTS(text=w,lang='ru',slow=False)
         tts.save(w+'.mp3');
         print "got tts result"
+
+def effects(words):
+    for w in set(words):
         waud = AudioSegment.from_mp3(w+'.mp3')
         waud.export('orig'+w+".wav", format="wav")
         cbn = sox.Transformer()
         # pitch shift combined audio up 3 semitones
-        cbn.pitch(-3.0)
+        cbn.pitch(-4.0)
+        cbn.allpass(40)
+        #cbn.bass(30)
+        cbn.flanger(delay=20)
+        cbn.reverb(reverberance=20)
+        cbn.gain(gain_db=3.0)
         cbn.convert(samplerate=8000)
         # create the output file
         cbn.build('orig'+w+'.wav', w+'.wav')
 
-save_tts(words)
+#save_tts(words)
+effects(words)
