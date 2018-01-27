@@ -8,13 +8,6 @@ from scipy.fftpack import fft
 import numpy as np
 import sox
 
-# Define FFT params:-------------------------------------------------------
-windowSize =212
-shiftSize = 160
-nFFT = 1024
-window_py = signal.hamming(windowSize)
-nOverlap_py = windowSize-shiftSize
-
 words = [u"Эй",u"клач",u"плач", u"мурзач"]
 wavs = [w+".wav" for w in words]
 
@@ -27,24 +20,70 @@ def save_tts(words):
         waud = AudioSegment.from_mp3(w+'.mp3')
         waud.export(w+".wav", format="wav")
 
-def fft_beat(name):
+def fft_pow(name):
+    # Define FFT params:-------------------------------------------------------
+    windowSize =212
+    shiftSize = 160
+    nFFT = 1024
+    window_py = signal.hamming(windowSize)
+    nOverlap_py = windowSize-shiftSize
     rate, data = wav.read( name+'.wav')
-    #data = data[:,1]
+    if(len(data.shape)>1):
+        data = data[:,1]
+    #data = data[len(data)/10:len(data)/6]
     f,t,Sxx = signal.spectrogram(data,fs=rate,window=window_py,
             noverlap=nOverlap_py,nfft=nFFT,detrend='constant',return_onesided=True,
             scaling='spectrum',mode='complex')
-
-    print Sxx
-    plt.pcolormesh(t, f, abs(Sxx))
+    Pow = [sum(abs(s)) for s in Sxx.T] 
+    #plt.pcolormesh(t, f, abs(Sxx))
+    '''
+    plt.figure(figsize=(20,10))
+    plt.plot(t,Pow)
+    plt.savefig('pow.png')
+    plt.clf()
+    fs = np.fft.fft(Pow)
+    freq = np.fft.fftfreq(t.shape[-1])
+    plt.figure(figsize=(20,10))
+    plt.plot(freq,abs(fs))
+    plt.show()
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
-    plt.show()
-    #jfft_out = fft(data)
-    #jplt.plot(data, np.abs(fft_out))
-    #jplt.show()
+    plt.savefig('ff.png')
+    '''
+    return Pow,t
 
-fft_beat(u'мурзач')
-# create combiner
+def mark_beats(P,t):
+    hist,brd = np.histogram(P,bins=range(7))
+    plt.hist(P)
+    #plt.show()
+    print max(P)/6
+    times =t[P>max(P)/6] 
+    return times
+
+def place_words(words,beat_filename,times):
+    # throwing out 2 first beats, yus to start later
+    times =  times[2:] 
+    beat = AudioSegment.from_wav(beat_filename+".wav")
+    tidx = 0
+    idx=0
+    result=AudioSegment.empty()
+    for w in words:
+        p,t = fft_pow(w)
+        emph = t[np.argmax(p)]
+        sl = AudioSegment.silent((times[idx]-emph)*1000)
+        waud = AudioSegment.from_wav(w+".wav")
+        result+=sl+waud
+        for i, t in enumerate(times):
+            # find next beat 
+            if t>result.duration_seconds:
+                idx=i
+                break
+    result = beat.overlay(result)
+    result.export("result.wav", format="wav")
+    return result
+P,t = fft_pow('beat')
+tms = mark_beats(P,t)
+place_words(words,'beat',tms)
 cbn = sox.Combiner()
 # pitch shift combined audio up 3 semitones
 cbn.pitch(3.0)
@@ -52,5 +91,4 @@ cbn.pitch(3.0)
 cbn.convert(samplerate=8000)
 # create the output file
 cbn.build(wavs, 'output.wav', 'concatenate')
-
 
