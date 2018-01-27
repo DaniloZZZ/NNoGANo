@@ -38,7 +38,7 @@ def fft_pow(name,low_pass=False):
             noverlap=nOverlap_py,nfft=nFFT,detrend='constant',return_onesided=True,
             scaling='spectrum',mode='complex')
     if(low_pass):
-        Sxx_sc = [ np.divide(s,np.log(f+2)) for s in Sxx.T]
+        Sxx_sc = [ np.divide(s,(f+2))[:5] for s in Sxx.T]
     else:
         Sxx_sc=Sxx.T
     Pow = [sum(abs(s)) for s in Sxx_sc] 
@@ -64,7 +64,7 @@ def mark_beats(P,t):
     #hist,brd = np.histogram(P,bins=range(7))
     #plt.hist(P)
     #plt.show()
-    thr = max(P)*0.95
+    thr = max(P)*0.9
     print "Power threshhold:",thr
     plt.figure(figsize=(20,10))
     plt.plot(t,P)
@@ -99,9 +99,9 @@ def place_words(words,beat_filename,times):
     result = beat.overlay(result)
     result.export("result.wav", format="wav")
     return result
-P,t = fft_pow('beat2',low_pass=True)
+P,t = fft_pow('bmorty',low_pass=True)
 tms = mark_beats(P,t)
-place_words(words,'beat2',tms)
+place_words(words,'bmorty',tms)
 cbn = sox.Combiner()
 # pitch shift combined audio up 3 semitones
 cbn.pitch(3.0)

@@ -9,16 +9,25 @@ import sox
 
 words= json.load(open('words.json'))
 lyr = codecs.open('lyrics.txt',encoding='utf-8')
-words=lyr.read().replace(",", "").split(' ')
+words=lyr.read().replace(",", "").replace('\n',' ').split(' ')
 #print np.array(words).astype('U')
-print (words)
-#print [w.encode('utf-8') for w in words]
+words=[w for w in words if len(w)>0]
 lyr.close()
+print (words)
+f = open('words.json','w+')
+f.write(json.dumps(words, ensure_ascii=False).encode('utf-8'))
+f.close()
+words= json.load(open('lyrics.json'))
+
+words = json.loads(json.dumps(words))
+#print [w.encode('utf-8') for w in words]
 
 wavs = [w+".wav" for w in words]
 
 def save_tts(words):    
     for w in set(words):
+        if len(w)==0:
+            continue
         print "Processing word ",w
         tts = gTTS(text=w,lang='ru',slow=False)
         tts.save(w+'.mp3');
