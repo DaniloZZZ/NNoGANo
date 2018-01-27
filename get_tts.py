@@ -8,19 +8,16 @@ from scipy.fftpack import fft
 import json
 import numpy as np
 import sox
+from optparse import OptionParser
 
+from settings import *
+parser = OptionParser()
 
-words= json.load(open('words.json'))
+(options, args) = parser.parse_args()
+BEATFNAME = args[0]
+
+words= json.load(open('lyrics.json'))
 wavs = [w+".wav" for w in words]
-
-def save_tts(words):
-    for w in words:
-        print "Processing word ",w
-        tts = gTTS(text=w,lang='ru',slow=True)
-        tts.save(w+'.mp3');
-        print "got tts result"
-        waud = AudioSegment.from_mp3(w+'.mp3')
-        waud.export(w+".wav", format="wav")
 
 def fft_pow(name,low_pass=False):
     # Define FFT params:-------------------------------------------------------
@@ -30,7 +27,7 @@ def fft_pow(name,low_pass=False):
     nFFT = 1024
     window_py = signal.hamming(windowSize)
     nOverlap_py = windowSize-shiftSize
-    rate, data = wav.read( name+'.wav')
+    rate, data = wav.read( WAV_DIR+name+'.wav')
     if(len(data.shape)>1):
         data = data[:,1]
     #data = data[len(data)/10:len(data)/6]
@@ -64,7 +61,7 @@ def mark_beats(P,t):
     #hist,brd = np.histogram(P,bins=range(7))
     #plt.hist(P)
     #plt.show()
-    thr = max(P)*0.8
+    thr = max(P)*0.65
     print "Power threshhold:",thr
     plt.figure(figsize=(20,10))
     plt.plot(t,P)
@@ -79,15 +76,20 @@ def place_words(words,beat_filename,times):
     #np.set_printoptions(threshold='nan')
     print "Beat accent times:",times
     #times =  times[2:] 
-    beat = AudioSegment.from_wav(beat_filename+".wav")
+    beat = AudioSegment.from_wav(WAV_DIR+beat_filename+".wav")
     tidx = 0
     idx=0
     result=AudioSegment.empty()
     for w in words:
-        p,t = fft_pow(w)
-        emph = t[np.argmax(p)]
-        sl = AudioSegment.silent((times[idx]-tidx-emph)*1000)
-        waud = AudioSegment.from_wav(w+".wav")
+        w = w.replace(' ','%20')
+        try:
+            p,t = fft_pow(w)
+            emph = t[np.argmax(p)]
+            emph=0
+            sl = AudioSegment.silent((times[idx]-tidx-emph)*1000)
+            waud = AudioSegment.from_wav(WAV_DIR+w+".wav")
+        except IOError :
+            continue
         print "placing word %s at %f idx:%i. word dur:%f"%(w,times[idx],idx,waud.duration_seconds)
         result+=sl+waud
         tidx = result.duration_seconds
@@ -99,14 +101,7 @@ def place_words(words,beat_filename,times):
     result = beat.overlay(result)
     result.export("result.wav", format="wav")
     return result
-P,t = fft_pow('bmorty',low_pass=True)
+P,t = fft_pow(BEATFNAME,low_pass=True)
 tms = mark_beats(P,t)
-place_words(words,'bmorty',tms)
-cbn = sox.Combiner()
-# pitch shift combined audio up 3 semitones
-cbn.pitch(3.0)
-# convert output to 8000 Hz stereo
-cbn.convert(samplerate=8000)
-# create the output file
-cbn.build(wavs, 'output.wav', 'concatenate')
+place_words(words,BEATFNAME,tms)
 
