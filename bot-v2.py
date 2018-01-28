@@ -62,7 +62,10 @@ class Bot:
                 print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
                 #text *= 5
 		self.beat_file_name = 'beat'+str(random.randrange(9))
-                text = Generate_Rap.main(*text)
+                new_text = Generate_Rap.main(*text)
+		new_text[:5] = text
+		new_text[20:25] = text
+		text = new_text
                 save_tts(text)
                 effects(text)
                 words = json.load(open('lyrics.json'))
