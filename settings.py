@@ -11,8 +11,8 @@ RECORD_MESSAGE = u'Запиши свой бит!'
 SETMOOD_MESSAGE = u'Какой у тебя настрой?'
 
 EXTRA_WORDS = [
-    u'ещщкере',
-    u'бляу',
+    u'хей',
+    u'ууу',
     u'бррря'
 ]
 
