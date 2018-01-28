@@ -61,7 +61,7 @@ class Bot:
     def GenerateSong(self, text):
         save_tts(text)
         effects(text)
-        self.beat_file_name = 'beat' + str(random.randrange(8))
+        self.beat_file_name = 'beat'+str(random.randrange(1,8))
         P, t = fft_pow(self.beat_file_name, low_pass=True)
         tms = mark_beats(P, t)
         place_words(text, self.beat_file_name, tms)
