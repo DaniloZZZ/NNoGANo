@@ -21,6 +21,14 @@ TELEGRAM_TOKEN = '521957216:AAFBuP4he_DGOzo9AovExQfExDQ3jJ8W1vA'
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
+def GenerateSong(test):
+    save_tts(text)
+    effects(text)
+    self.beat_file_name = 'beat'+str(random.randrange(8))
+    P, t = fft_pow(self.beat_file_name, low_pass=True)
+    tms = mark_beats(P, t)
+    place_words(text, self.beat_file_name, tms)
+
 class Bot:
     def __init__(self):
         self.last_command = None
@@ -118,7 +126,7 @@ class Bot:
             self.uploaded_audio+=1
             local_file.write(data)
             local_file.close()
-            text = Generate_Rap.main(*settings.EXTRA_WORDS)[:10]
+            text = Generate_Rap.main(*settings.EXTRA_WORDS)[:20]
             #text = ['отладка',"фууу"]
             print text
             save_tts(text)
@@ -128,7 +136,7 @@ class Bot:
             tms = mark_beats(P, t)
             place_words(text, self.beat_file_name, tms)
             print "Created Track."
-            add_adlib(chat_id)
+            add_adlib(chat_id,loudness = -7.0)
             print "ADLIB Track."
             wavtomp3('result',0,45)
             print "converted Track."
