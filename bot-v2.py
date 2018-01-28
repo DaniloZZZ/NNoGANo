@@ -21,13 +21,7 @@ TELEGRAM_TOKEN = '521957216:AAFBuP4he_DGOzo9AovExQfExDQ3jJ8W1vA'
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-def GenerateSong(test):
-    save_tts(text)
-    effects(text)
-    self.beat_file_name = 'beat'+str(random.randrange(8))
-    P, t = fft_pow(self.beat_file_name, low_pass=True)
-    tms = mark_beats(P, t)
-    place_words(text, self.beat_file_name, tms)
+
 
 class Bot:
     def __init__(self):
@@ -46,9 +40,10 @@ class Bot:
         setbro_handler = CommandHandler('setbro', self.setbro)
         setmood_handler = CommandHandler('setmood', self.setmood)
         record_handler = CommandHandler('record', self.record)
+        rapmsg_handler = CommandHandler('rapmsg', self.rapmsg)
 
         message_handler = MessageHandler(Filters.text, self.text_handler)
-	audio_handler = MessageHandler(Filters.voice, self.voice_handler)
+        audio_handler = MessageHandler(Filters.voice, self.voice_handler)
 
         self.dispatcher.add_handler(message_handler)
         self.dispatcher.add_handler(audio_handler)
@@ -62,6 +57,14 @@ class Bot:
         self.dispatcher.add_error_handler(self.error)
 
         self.updater.start_polling()
+
+    def GenerateSong(self, text):
+        save_tts(text)
+        effects(text)
+        self.beat_file_name = 'beat' + str(random.randrange(8))
+        P, t = fft_pow(self.beat_file_name, low_pass=True)
+        tms = mark_beats(P, t)
+        place_words(text, self.beat_file_name, tms)
 
     def error(self, bot, update, error):
         self.logger.warning('Update "%s" caused error "%s"', update, error)
@@ -95,6 +98,14 @@ class Bot:
             self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
             message = bot.send_audio(audio=open('result.mp3'),
                                      chat_id=chat_id)
+        elif self.last_command == 'rapmsg':
+            message = bot.send_message(text="Делаем рэп из твоего шедревра...",
+                                       chat_id=chat_id)
+            self.GenerateSong([''])
+            add_adlib(chat_id,loudness = +1)
+            wavtomp3('result', 0, 45)
+            message = bot.send_audio(audio=open('result.mp3'),
+                                     chat_id=chat_id)
         else:
             bot.send_message(chat_id=update.message.chat_id,
                              text=random.choice(settings.NEUTRAL_MESSAGES))
@@ -106,12 +117,7 @@ class Bot:
         print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
         text = Generate_Rap.main(*text)[:20]
         print text
-        save_tts(text)
-        effects(text)
-        self.beat_file_name = 'beat'+str(random.randrange(8))
-        P, t = fft_pow(self.beat_file_name, low_pass=True)
-        tms = mark_beats(P, t)
-        place_words(text, self.beat_file_name, tms)
+        self.GenerateSong(text)
         wavtomp3('result',0,45)
         print "Created Track."
 
@@ -126,15 +132,10 @@ class Bot:
             self.uploaded_audio+=1
             local_file.write(data)
             local_file.close()
-            text = Generate_Rap.main(*settings.EXTRA_WORDS)[:20]
+            text = Generate_Rap.main(*settings.EXTRA_WORDS)[:10]
             #text = ['отладка',"фууу"]
             print text
-            save_tts(text)
-            effects(text)
-            self.beat_file_name = 'beat'+str(random.randrange(8))
-            P, t = fft_pow(self.beat_file_name, low_pass=True)
-            tms = mark_beats(P, t)
-            place_words(text, self.beat_file_name, tms)
+            self.GenerateSong(text)
             print "Created Track."
             add_adlib(chat_id,loudness = -7.0)
             print "ADLIB Track."
@@ -159,6 +160,11 @@ class Bot:
         self.last_command = 'setbro'
         bot.send_message(chat_id=update.message.chat_id,
                          text=settings.SETBRO_MESSAGE)
+
+    def rapmsg(self, bot, update):
+        self.last_command = 'rapmsg'
+        bot.send_message(chat_id=update.message.chat_id,
+                         text=settings.RECORD_MESSAGE)
 
     def easypeasy(self, bot, update):
         self.last_command = 'easypeasy'
