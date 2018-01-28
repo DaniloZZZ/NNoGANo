@@ -38,8 +38,10 @@ class Bot:
         record_handler = CommandHandler('record', self.record)
 
         message_handler = MessageHandler(Filters.text, self.text_handler)
+	audio_handler = MessageHandler(Filters.voice, self.voice_handler)
 
         self.dispatcher.add_handler(message_handler)
+        self.dispatcher.add_handler(audio_handler)
 
         self.dispatcher.add_handler(setmood_handler)
         self.dispatcher.add_handler(record_handler)
@@ -57,9 +59,8 @@ class Bot:
     def text_handler(self, bot, update):
         chat_id = update.message.chat_id
         text = update.message.text.lower().split()
-        print "received Message:",update.message.text
         if self.last_command == 'easypeasy':
-            message = bot.send_message(text="Cейчас все будет...",
+            message = bot.send_audio(text="Cейчас все будет...",
                                      chat_id=chat_id)
 
             self.work_with_easypeasy(text, chat_id)
@@ -67,16 +68,25 @@ class Bot:
             message = bot.send_audio(audio=open('result.wav'),
                                      chat_id=chat_id)
             print "DONE"
-        elif self.last_command == 'record':
-            message = bot.send_message(text="Делаем рэп из твоего шедревра...",
-                                     chat_id=chat_id)
-            self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
-            message = bot.send_audio(audio=open('result.wav'),
-                                     chat_id=chat_id)
         elif self.last_command == 'setbro':
             pass
         elif self.last_command == 'setmood':
             pass
+        else:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text=random.choice(settings.NEUTRAL_MESSAGES))
+        self.last_command = None
+
+    def voice_handler(self, bot, update):
+        chat_id = update.message.chat_id
+        text = update.message.text.lower().split()
+        print 'get audio'
+        if self.last_command == 'record':
+            message = bot.send_audio(text="Делаем рэп из твоего шедревра...",
+                                     chat_id=chat_id)
+            self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
+            message = bot.send_audio(audio=open('result.wav'),
+                                     chat_id=chat_id)
         else:
             bot.send_message(chat_id=update.message.chat_id,
                              text=random.choice(settings.NEUTRAL_MESSAGES))
