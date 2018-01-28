@@ -154,7 +154,7 @@ class Bot:
 	    print "Starting song Gen."
             self.GenerateSong(text)
             print "Created Track."
-            add_adlib(chat_id,loudness = -2.0)
+            add_adlib(chat_id,loudness = 1.0)
             print "ADLIB adding to Track."
             wavtomp3('result',0,45)
             print "converted Track."

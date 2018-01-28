@@ -69,7 +69,7 @@ def save_tts(words):
 def add_adlib(user_id, loudness = -6.0):
 	files = os.listdir(ADLIB_DIR+str(user_id))
 	print files
-	fil = sorted(files)[0]
+	fil = sorted(files)[-1]
 	print "found %i files for user %i"%(len(files),user_id)
 	loop_sample = AudioSegment.empty()
 	beat = AudioSegment.from_wav("result.wav")
