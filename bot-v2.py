@@ -95,13 +95,14 @@ class Bot:
     def voice_handler(self, bot, update):
         chat_id = update.message.chat_id
         print 'Voice Handler'
+        voice_path=bot.getFile(update.message.voice.file_id)
         try:
             link = urlopen(voice_path.file_path)
             print 'downloading voice'
             if not os.path.exists(settings.ADLIB_DIR + str(chat_id)):
 				print "creating dir"
 				os.makedirs(settings.ADLIB_DIR + str(chat_id))
-            local_file=open((settings.ADLIB_DIR + str(chat_id) + '/' + str(self.uploaded_audio) + '.wav'), 'w+') 
+            local_file=open((settings.ADLIB_DIR + str(chat_id) + '/' + str(self.uploaded_audio) + '.ogg'), 'w+') 
             data = link.read()
             self.uploaded_audio+=1
             local_file.write(data)
