@@ -67,19 +67,21 @@ def save_tts(words):
         print "got tts result"
 
 def add_adlib(user_id, loudness = -6.0):
-    fil = os.listdir(ADLIB_DIR+str(user_id))[-1]
-    print "found %i files for user %i"%(len(fil),user_id)
-    loop_sample = AudioSegment.empty()
-    beat = AudioSegment.from_wav("result.wav")
-    loop_sample+= AudioSegment.from_ogg(ADLIB_DIR+str(user_id)+'/'+fil)
-    num_loops = beat.duration_seconds/(loop_sample.duration_seconds+1)
-    print "looping user files %i times"%num_loops
+	files = os.listdir(ADLIB_DIR+str(user_id))
+	print files
+	fil = sorted(files)[0]
+	print "found %i files for user %i"%(len(files),user_id)
+	loop_sample = AudioSegment.empty()
+	beat = AudioSegment.from_wav("result.wav")
+	loop_sample+= AudioSegment.from_wav(ADLIB_DIR+str(user_id)+'/'+fil)
+	num_loops = beat.duration_seconds/(loop_sample.duration_seconds+1)
+	print "looping user files %i times"%num_loops
     
-    loop_quiet = loop_sample*int(num_loops )+ loudness
-    result = beat.overlay(loop_quiet)
-    result.export("result.wav", format="wav")
+	loop_quiet = loop_sample*int(num_loops )+ loudness
+	result = beat.overlay(loop_quiet)
+	result.export("result.wav", format="wav")
 
-def effects(words):
+def effects(words,voice_speed = 1.2):
     for w in set(words):
         w = w.replace(' ','%20')
         waud = AudioSegment.from_mp3(TMP_DIR+w+'.mp3')
@@ -94,7 +96,7 @@ def effects(words):
         cbn.gain(gain_db=1.0)
         #cbn.noiseprof('orig'+w+'.wav','noiseprof')
         #cbn.noisered('noizeprof', amount=0.5)
-        cbn.tempo(1.2)
+        cbn.tempo(voice_speed)
         cbn.loudness(1.0)
         #cbn.convert(samplerate=8000)
         # create the output file

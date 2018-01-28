@@ -95,6 +95,20 @@ class Bot:
     def voice_handler(self, bot, update):
         chat_id = update.message.chat_id
         print 'Voice Handler'
+        try:
+            link = urlopen(voice_path.file_path)
+            print 'downloading voice'
+            if not os.path.exists(settings.ADLIB_DIR + str(chat_id)):
+				print "creating dir"
+				os.makedirs(settings.ADLIB_DIR + str(chat_id))
+            local_file=open((settings.ADLIB_DIR + str(chat_id) + '/' + str(self.uploaded_audio) + '.wav'), 'w+') 
+            data = link.read()
+            self.uploaded_audio+=1
+            local_file.write(data)
+            local_file.close()
+        except Exception as e:
+            print "Can not download and save user's voice message"
+            print e
         if self.last_command == 'record':
             message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                      chat_id=chat_id)
@@ -102,12 +116,12 @@ class Bot:
             message = bot.send_audio(audio=open('result.mp3'),
                                      chat_id=chat_id)
         elif self.last_command == 'rapmsg':
-            message = bot.send_message(text="Делаем рэп из твоего шедревра...",
+			message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                        chat_id=chat_id)
-            self.GenerateSong(None)
-            add_adlib(chat_id,loudness = +1)
-            wavtomp3('result', 0, 45)
-            message = bot.send_audio(audio=open('result.mp3'),
+			self.GenerateSong(None)
+			add_adlib(chat_id,loudness = +1)
+			wavtomp3('result', 0, 45)
+			message = bot.send_audio(audio=open('result.mp3'),
                                      chat_id=chat_id)
         else:
             bot.send_message(chat_id=update.message.chat_id,
@@ -132,19 +146,6 @@ class Bot:
         print "Created Track."
 
     def work_with_record(self, voice_path, chat_id):
-        try:
-            link = urlopen(voice_path.file_path)
-            print 'downloading voice'
-            if not os.path.exists(settings.ADLIB_DIR + str(chat_id)):
-                os.makedirs(settings.ADLIB_DIR + str(chat_id))
-            local_file=open((settings.ADLIB_DIR + str(chat_id) + '/' + str(self.uploaded_audio) + '.ogg'), 'w+') 
-            data = link.read()
-            self.uploaded_audio+=1
-            local_file.write(data)
-            local_file.close()
-        except Exception as e:
-            print "Can not download and save user's voice message"
-            print e
 	try:
             text = Generate_Rap.main(*settings.EXTRA_WORDS)[:10]
             #text = ['отладка',"фууу"]

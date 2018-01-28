@@ -65,14 +65,14 @@ def mark_beats(P,t):
     return times
 
 def place_words(words,beat_filename,times):
-    # throwing out 2 first beats, yus to start later
-    #np.set_printoptions(threshold='nan')
-    print "Beat accent times:",times
-    #times =  times[2:] 
-    beat = AudioSegment.from_wav(WAV_DIR+beat_filename+".wav")
-    tidx = 0
-    idx=0
-    result=AudioSegment.empty()
+# throwing out 2 first beats, yus to start later
+#np.set_printoptions(threshold='nan')
+	print "Beat accent times:",times
+#times =  times[2:] 
+	beat = AudioSegment.from_wav(WAV_DIR+beat_filename+".wav")
+	tidx = 0
+	idx=0
+	result=AudioSegment.empty()
 	if words:
 	    for w in words:
 		w = w.replace(' ','%20')
@@ -93,9 +93,9 @@ def place_words(words,beat_filename,times):
 		    if t>tidx:  
 			idx=i
 			break
-    result = beat.overlay(result)
-    result.export("result.wav", format="wav")
-    return result
+	result = beat.overlay(result)
+	result.export("result.wav", format="wav")
+	return result
 
 if __name__ == "__main__":
     # execute only if run as a script
