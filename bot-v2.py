@@ -60,12 +60,13 @@ class Bot:
         self.updater.start_polling()
 
     def GenerateSong(self, text):
-        save_tts(text)
-        effects(text)
-        self.beat_file_name = 'beat'+str(random.randrange(1,8))
-        P, t = fft_pow(self.beat_file_name, low_pass=True)
-        tms = mark_beats(P, t)
-        place_words(text, self.beat_file_name, tms)
+		if text:
+			save_tts(text)
+			effects(text, voice_speed = 1.23)
+			self.beat_file_name = 'beat'+str(random.randrange(1,8))
+			P, t = fft_pow(self.beat_file_name, low_pass=True)
+			tms = mark_beats(P, t)
+		place_words(text, self.beat_file_name, tms)
 
     def error(self, bot, update, error):
         self.logger.warning('Update "%s" caused error "%s"', update, error)
@@ -103,7 +104,7 @@ class Bot:
         elif self.last_command == 'rapmsg':
             message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                        chat_id=chat_id)
-            self.GenerateSong([''])
+            self.GenerateSong(None)
             add_adlib(chat_id,loudness = +1)
             wavtomp3('result', 0, 45)
             message = bot.send_audio(audio=open('result.mp3'),
