@@ -24,7 +24,7 @@ class Bot:
         self.last_command = None
         self.waiting = False
         self.uploaded_audio = 0
-        self.beat_file_name = 'bfree'
+        self.beat_file_name = 'beat'+str(random.randrange(8))
 
         self.logger = logging.getLogger(__name__)
 
@@ -60,11 +60,10 @@ class Bot:
         chat_id = update.message.chat_id
         text = update.message.text.lower().split()
         if self.last_command == 'easypeasy':
-            message = bot.send_audio(text="Cейчас все будет...",
+            message = bot.send_message(text="Cейчас все будет...",
                                      chat_id=chat_id)
 
             self.work_with_easypeasy(text, chat_id)
-
             message = bot.send_audio(audio=open('result.wav'),
                                      chat_id=chat_id)
             print "DONE"
@@ -79,10 +78,9 @@ class Bot:
 
     def voice_handler(self, bot, update):
         chat_id = update.message.chat_id
-        text = update.message.text.lower().split()
         print 'get audio'
         if self.last_command == 'record':
-            message = bot.send_audio(text="Делаем рэп из твоего шедревра...",
+            message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                      chat_id=chat_id)
             self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
             message = bot.send_audio(audio=open('result.wav'),
@@ -100,9 +98,7 @@ class Bot:
         print text
         save_tts(text)
         effects(text)
-        words = json.load(open('lyrics.json'))
-        wavs = [w + ".wav" for w in words]
-        self.beat_file_name = 'bfree'
+        self.beat_file_name = 'beat'+str(random.randrange(8))
         P, t = fft_pow(self.beat_file_name, low_pass=True)
         tms = mark_beats(P, t)
         place_words(text, self.beat_file_name, tms)
@@ -117,7 +113,17 @@ class Bot:
             with open(os.path.basename(settings.ADLIB_DIR + str(chat_id) +
                                                '/' + str(self.uploaded_audio) + '.ogg'), 'wb') as local_file:
                 local_file.write(link.read())
+                text = Generate_Rap.main(*settings.EXTRA_WORDS)[:20]
+                print text
+                save_tts(text)
+                effects(text)
+                self.beat_file_name = 'beat'+str(random.randrange(8))
+                P, t = fft_pow(self.beat_file_name, low_pass=True)
+                tms = mark_beats(P, t)
+                place_words(text, self.beat_file_name, tms)
+                print "Created Track."
                 add_addlib(chat_id)
+                wavromap3('result',0,45)
         except Exception as e:
             print "Can not download user's voice message"
             print e
