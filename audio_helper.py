@@ -8,6 +8,7 @@ def mp3towav(filepath,fr,to):
     waud.export(filepath+".wav", format="wav")
 
 def wavtomp3(filepath,fr,to):
+    print "convertiong to mp3"
     waud = AudioSegment.from_wav(filepath+'.wav')
     waud=waud[1000*fr:to*1000]
     waud.export(filepath+".mp3", format="mp3")

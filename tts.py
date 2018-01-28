@@ -67,16 +67,15 @@ def save_tts(words):
         print "got tts result"
 
 def add_adlib(user_id):
-    files = os.listdir(ADLIB_DIR+user_id)
+    fil = os.listdir(ADLIB_DIR+str(user_id))[-1]
     print "found %i files for user %i"%(len(files),user_id)
     loop_sample = AudioSegment.empty()
     beat = AudioSegment.from_wav("result.wav")
-    for ogg in files:
-        loop_sample+= AudioSegment.from_ogg(ADLIB_DIR+ogg)
-    num_loops = beat.duration_seconds/loop_sample.duration_seconds
+    loop_sample+= AudioSegment.from_ogg(ADLIB_DIR+str(user_id)+'/'+fil)
+    num_loops = beat.duration_seconds/(loop_sample.duration_seconds+1)
     print "looping user files %i times"%num_loops
     
-    loop_quiet = loop_sample*num_loops - 4 
+    loop_quiet = loop_sample*int(num_loops )- 7
     result = beat.overlay(loop_quiet)
     result.export("result.wav", format="wav")
 

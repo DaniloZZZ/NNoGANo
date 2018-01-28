@@ -11,6 +11,8 @@ import random
 import Generate_Rap
 from tts import *
 from get_tts import *
+from audio_helper import *
+
 import settings
 
 #TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
@@ -24,7 +26,7 @@ class Bot:
         self.last_command = None
         self.waiting = False
         self.uploaded_audio = 0
-        self.beat_file_name = 'beat'+str(random.randrange(8))
+        self.beat_file_name = 'beat'+str(random.randrange(1,8))
 
         self.logger = logging.getLogger(__name__)
 
@@ -64,7 +66,7 @@ class Bot:
                                      chat_id=chat_id)
 
             self.work_with_easypeasy(text, chat_id)
-            message = bot.send_audio(audio=open('result.wav'),
+            message = bot.send_audio(audio=open('result.mp3'),
                                      chat_id=chat_id)
             print "DONE"
         elif self.last_command == 'setbro':
@@ -83,7 +85,7 @@ class Bot:
             message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                      chat_id=chat_id)
             self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
-            message = bot.send_audio(audio=open('result.wav'),
+            message = bot.send_audio(audio=open('result.mp3'),
                                      chat_id=chat_id)
         else:
             bot.send_message(chat_id=update.message.chat_id,
@@ -102,6 +104,7 @@ class Bot:
         P, t = fft_pow(self.beat_file_name, low_pass=True)
         tms = mark_beats(P, t)
         place_words(text, self.beat_file_name, tms)
+        wavtomp3('result',0,45)
         print "Created Track."
 
     def work_with_record(self, voice_path, chat_id):
@@ -110,20 +113,25 @@ class Bot:
             print 'downloading voice'
             if not os.path.exists(settings.ADLIB_DIR + str(chat_id)):
                 os.makedirs(settings.ADLIB_DIR + str(chat_id))
-            with open(os.path.basename(settings.ADLIB_DIR + str(chat_id) +
-                                               '/' + str(self.uploaded_audio) + '.ogg'), 'wb') as local_file:
-                local_file.write(link.read())
-                text = Generate_Rap.main(*settings.EXTRA_WORDS)[:20]
-                print text
-                save_tts(text)
-                effects(text)
-                self.beat_file_name = 'beat'+str(random.randrange(8))
-                P, t = fft_pow(self.beat_file_name, low_pass=True)
-                tms = mark_beats(P, t)
-                place_words(text, self.beat_file_name, tms)
-                print "Created Track."
-                add_addlib(chat_id)
-                wavromap3('result',0,45)
+            local_file=open((settings.ADLIB_DIR + str(chat_id) + '/' + str(self.uploaded_audio) + '.ogg'), 'w+') 
+            data = link.read()
+            self.uploaded_audio+=1
+            local_file.write(data)
+            local_file.close()
+            text = Generate_Rap.main(*settings.EXTRA_WORDS)[:10]
+            #text = ['отладка',"фууу"]
+            print text
+            save_tts(text)
+            effects(text)
+            self.beat_file_name = 'beat'+str(random.randrange(8))
+            P, t = fft_pow(self.beat_file_name, low_pass=True)
+            tms = mark_beats(P, t)
+            place_words(text, self.beat_file_name, tms)
+            print "Created Track."
+            add_adlib(chat_id)
+            print "ADLIB Track."
+            wavtomp3('result',0,45)
+            print "converted Track."
         except Exception as e:
             print "Can not download user's voice message"
             print e
