@@ -46,7 +46,7 @@ def echo(bot, update):
                 effects(c)
                 words= json.load(open('lyrics.json'))
                 wavs = [w+".wav" for w in words]
-                BEATFNAME='bfree'
+                BEATFNAME='beat1'
                 P,t = fft_pow(BEATFNAME,low_pass=True)
                 tms = mark_beats(P,t)
                 place_words(c,BEATFNAME,tms)

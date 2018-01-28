@@ -10,8 +10,12 @@ import sys
 from settings import *
 import os.path
 reload(sys)
+if "DISPLAY" not in os.environ:
+		import matplotlib
+		matplotlib.use('Agg')
 sys.setdefaultencoding('utf-8')
 UPD = True
+
 
 def load_words(filename):
     lyr = codecs.open(filename,encoding='utf-8')
