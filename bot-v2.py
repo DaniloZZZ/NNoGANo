@@ -53,6 +53,7 @@ class Bot:
         self.dispatcher.add_handler(setbro_handler)
         self.dispatcher.add_handler(easypeasy_handler)
         self.dispatcher.add_handler(help_handler)
+        self.dispatcher.add_handler(rapmsg_handler)
 
         self.dispatcher.add_error_handler(self.error)
 
@@ -70,6 +71,7 @@ class Bot:
         self.logger.warning('Update "%s" caused error "%s"', update, error)
 
     def text_handler(self, bot, update):
+        print 'Text Handler'
         chat_id = update.message.chat_id
         text = update.message.text.lower().split()
         if self.last_command == 'easypeasy':
@@ -91,7 +93,7 @@ class Bot:
 
     def voice_handler(self, bot, update):
         chat_id = update.message.chat_id
-        print 'get audio'
+        print 'Voice Handler'
         if self.last_command == 'record':
             message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                      chat_id=chat_id)
@@ -116,13 +118,14 @@ class Bot:
             text += settings.EXTRA_WORDS[:5 - len(text)]
         else:
             text = text[:5]
-        print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
+        print "EASYPEASY words: %s,id%i" % (text, chat_id)
         new_text = Generate_Rap.main(*text)[:35]
         new_text[:5] = text
         new_text[10:15] = text
         new_text[20:25] = text
         text = new_text
         print text
+        print "Starting song Gen."
         self.GenerateSong(text)
         wavtomp3('result',0,45)
         print "Created Track."
@@ -138,17 +141,22 @@ class Bot:
             self.uploaded_audio+=1
             local_file.write(data)
             local_file.close()
+        except Exception as e:
+            print "Can not download and save user's voice message"
+            print e
+	try:
             text = Generate_Rap.main(*settings.EXTRA_WORDS)[:10]
             #text = ['отладка',"фууу"]
             print text
+	    print "Starting song Gen."
             self.GenerateSong(text)
             print "Created Track."
-            add_adlib(chat_id,loudness = -7.0)
-            print "ADLIB Track."
+            add_adlib(chat_id,loudness = -2.0)
+            print "ADLIB adding to Track."
             wavtomp3('result',0,45)
             print "converted Track."
         except Exception as e:
-            print "Can not download user's voice message"
+            print "Can not Generate Rap Song"
             print e
         #
 
