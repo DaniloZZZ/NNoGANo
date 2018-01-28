@@ -68,7 +68,7 @@ def save_tts(words):
 
 def add_adlib(user_id, loudness = -6.0):
     fil = os.listdir(ADLIB_DIR+str(user_id))[-1]
-    print "found %i files for user %i"%(len(files),user_id)
+    print "found %i files for user %i"%(len(fil),user_id)
     loop_sample = AudioSegment.empty()
     beat = AudioSegment.from_wav("result.wav")
     loop_sample+= AudioSegment.from_ogg(ADLIB_DIR+str(user_id)+'/'+fil)
