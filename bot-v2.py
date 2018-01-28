@@ -62,7 +62,7 @@ class Bot:
     def GenerateSong(self, text):
 		if text:
 			save_tts(text)
-			effects(text, voice_speed = 1.23)
+			effects(text, voice_speed = 1.)
 		self.beat_file_name = 'beat'+str(random.randrange(1,8))
 		P, t = fft_pow(self.beat_file_name, low_pass=True)
 		tms = mark_beats(P, t)
@@ -73,6 +73,7 @@ class Bot:
 
     def text_handler(self, bot, update):
         print 'Text Handler'
+        print self.last_command
         chat_id = update.message.chat_id
         text = update.message.text.lower().split()
         if self.last_command == 'easypeasy':
