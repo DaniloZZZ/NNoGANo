@@ -1,10 +1,10 @@
-
+#!/usr/bin/env python3
 # coding: utf-8
 
 # In[6]:
 
 
-import urllib.request as r
+# import urllib.request as r
 #import bs4
 import re
 import string
@@ -139,7 +139,7 @@ class Utils(object):
             total = len(values)
             probabilities = OrderedDict()
             for v in values:
-                probabilities[v] = counts[v] / total
+                probabilities[v] = counts[v] / float(total)
             chains_with_probabilities[key] = OrderedDict(sorted(list(probabilities.items()),
                                                                 key=lambda x: x[0])
                                                          )
@@ -217,6 +217,7 @@ class TextGenerator(object):
                     slice_size = 0
                     prev_chain = ()
                     break
+            # print(slice_size)
             new_word = self.__choice(self.probabilities[slice_size][prev_chain])
             generated_words.append(new_word)
         generated_words[0] = generated_words[0].capitalize()
@@ -238,7 +239,7 @@ class TextGenerator(object):
 
 
 import random
-def main(a,b='Сощщников',c='Дима',d='Даня',e='Саша'):
+def main(a,b=u'Сошников',c=u'Дима',d=u'Даня',e=u'Саша'):
     result = ""
     text = ""
     stop_world='@'
@@ -246,11 +247,9 @@ def main(a,b='Сощщников',c='Дима',d='Даня',e='Саша'):
         for line in f.readlines():
             text += line
     tg = TextGenerator(5, 200)
-    print(type(tg))
     tg.fit(text)
     rap_gad = tg.generate()
     l = rap_gad.split(' ')
-    print(type(l))
     t = ''
     f = 0
     k = 0
@@ -261,26 +260,26 @@ def main(a,b='Сощщников',c='Дима',d='Даня',e='Саша'):
             
     for i in range(0,len(l)-4):
         if (l[i] == l[i+1]) or (l[i+1] == l[i+7]):
-            print("Overfiting on ", l[i])
             stop_word = l[i]
             f = 1
             break
+    
+    # print ' '.join(l[::5])
 #    while i != len(l)-k:
  #       if (l[i] == stop_word):
   #          l = l[::i-1]+l[i+1::]
    #         k +=1
     #    i += 1
-    for i in range(0, len(l)):
-        print(l[i], end=' ')
-        if (i + 1) % 6 == 0:
-            print()
-    return l[::25]
+    # for i in range(0, len(l)):
+    #     print(l[i], end=' ')
+    #     if (i + 1) % 6 == 0:
+    #         print()
+    return l
 
 
 # In[164]:
 
-
-l = main('Конференция')
+l = main(u'Конференция')
 
 
 # In[121]:
