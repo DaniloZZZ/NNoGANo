@@ -42,6 +42,9 @@ class Bot:
         self.dispatcher.add_handler(easypeasy_handler)
         self.dispatcher.add_handler(help_handler)
 
+	self.updater.start_polling()
+	self.updater.idle()
+
     def text_handler(self, bot, update):
         chat_id = update.message.chat_id
         text = update.message.text.lower().split()
