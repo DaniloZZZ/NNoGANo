@@ -2,6 +2,16 @@
 from pydub import AudioSegment
 from optparse import OptionParser
 
+def mp3towav(filepath,fr,to):
+    waud = AudioSegment.from_mp3(filepath+'.mp3')
+    waud=waud[1000*fr:to*1000]
+    waud.export(filepath+".wav", format="wav")
+
+def wavtomp3(filepath,fr,to):
+    waud = AudioSegment.from_wav(filepath+'.wav')
+    waud=waud[1000*fr:to*1000]
+    waud.export(filepath+".mp3", format="mp3")
+
 if __name__ == "__main__":
     parser = OptionParser()
 
@@ -14,13 +24,3 @@ if __name__ == "__main__":
     print args
     w = args[0]
     mp3towav(w,options.fr,options.to)
-
-def mp3towav(filepath,fr,to):
-    waud = AudioSegment.from_mp3(filepath+'.mp3')
-    waud=waud[1000*fr:to*1000]
-    waud.export(filepath+".wav", format="wav")
-
-def wavtomp3(filepath,fr,to):
-    waud = AudioSegment.from_wav(filepath+'.wav')
-    waud=waud[1000*fr:to*1000]
-    waud.export(filepath+".mp3", format="mp3")
