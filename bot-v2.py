@@ -7,6 +7,7 @@ import logging
 import pickle
 import os
 import random
+import Generate_Rap
 from tts import *
 from get_tts import *
 import settings
@@ -58,7 +59,7 @@ class Bot:
             if len(text) < 5:
                 text += settings.EXTRA_WORDS[:5 - len(text)]
             print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
-            text *= 5
+            text = Generate_Rap.main(*text)
             save_tts(text)
             effects(text)
             words = json.load(open('lyrics.json'))
