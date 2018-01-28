@@ -1,0 +1,6 @@
+waves/*
+*.swp
+*.pyc
+temp/*
+origins/*
+result.wav

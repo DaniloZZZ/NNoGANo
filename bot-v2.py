@@ -23,7 +23,7 @@ class Bot:
     def __init__(self):
         self.last_command = None
         self.waiting = False
-        self.beat_file_name = 'bfree'
+        self.beat_file_name = 'beat'+str(random.randrange(9))
 
         self.logger = logging.getLogger(__name__)
 
@@ -54,25 +54,28 @@ class Bot:
         self.logger.warning('Update "%s" caused error "%s"', update, error)
 
     def text_handler(self, bot, update):
-        try:
             chat_id = update.message.chat_id
             text = update.message.text.lower().split()
             if self.last_command == 'easypeasy':
                 if len(text) < 5:
                     text += settings.EXTRA_WORDS[:5 - len(text)]
                 print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
-                text *= 5
-                text = Generate_Rap.main(*text)
+                #text *= 5
+		self.beat_file_name = 'beat'+str(random.randrange(9))
+                new_text = Generate_Rap.main(*text)
+		new_text[:5] = text
+		new_text[20:25] = text
+		text = new_text
                 save_tts(text)
                 effects(text)
                 words = json.load(open('lyrics.json'))
                 wavs = [w + ".wav" for w in words]
-                self.beat_file_name = 'bfree'
+		self.beat_file_name = 'beat1'
                 P, t = fft_pow(self.beat_file_name, low_pass=True)
                 tms = mark_beats(P, t)
                 place_words(text, self.beat_file_name, tms)
                 print "Created Track."
-                wavtomp3('./result.wav',0,45)
+                wavtomp3('./result',0,45)
                 message = bot.send_audio(audio=open('result.mp3'),
                                          chat_id=chat_id)
                 print "DONE"
@@ -86,8 +89,6 @@ class Bot:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text=random.choice(settings.NEUTRAL_MESSAGES))
             self.last_command = None
-        except Exeption as e:
-            print "WOOOH" ,"ERROR",e
 
     def record(self, bot, update):
         self.last_command = 'record'

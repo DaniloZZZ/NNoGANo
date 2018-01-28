@@ -258,7 +258,7 @@ def main(a,b=u'Сошников',c=u'Дима',d=u'Даня',e=u'Саша'):
         if i%10==2:
             l[i]=random.choice([a,b,c,d,e])
             
-    for i in range(0,len(l)-4):
+    for i in range(0,len(l)-8):
         if (l[i] == l[i+1]) or (l[i+1] == l[i+7]):
             stop_word = l[i]
             f = 1
