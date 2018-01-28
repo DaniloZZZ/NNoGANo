@@ -73,25 +73,26 @@ def place_words(words,beat_filename,times):
     tidx = 0
     idx=0
     result=AudioSegment.empty()
-    for w in words:
-        w = w.replace(' ','%20')
-        try:
-            p,t = fft_pow(w)
-            emph = t[np.argmax(p)]
-            #emph=0
-            sl = AudioSegment.silent((times[idx]-tidx-emph)*1000)
-            waud = AudioSegment.from_wav(WAV_DIR+w+".wav")
-        except IOError :
-            print "IOErr: file ",WAV_DIR+w+'.wav'
-            continue
-        print "placing word %s at %f idx:%i. word dur:%f"%(w,times[idx],idx,waud.duration_seconds)
-        result+=sl+waud
-        tidx = result.duration_seconds
-        for i, t in enumerate(times):
-            # find next beat 
-            if t>tidx:  
-                idx=i
-                break
+	if words:
+	    for w in words:
+		w = w.replace(' ','%20')
+		try:
+		    p,t = fft_pow(w)
+		    emph = t[np.argmax(p)]
+		    #emph=0
+		    sl = AudioSegment.silent((times[idx]-tidx-emph)*1000)
+		    waud = AudioSegment.from_wav(WAV_DIR+w+".wav")
+		except IOError :
+		    print "IOErr: file ",WAV_DIR+w+'.wav'
+		    continue
+		print "placing word %s at %f idx:%i. word dur:%f"%(w,times[idx],idx,waud.duration_seconds)
+		result+=sl+waud
+		tidx = result.duration_seconds
+		for i, t in enumerate(times):
+		    # find next beat 
+		    if t>tidx:  
+			idx=i
+			break
     result = beat.overlay(result)
     result.export("result.wav", format="wav")
     return result
