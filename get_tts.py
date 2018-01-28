@@ -78,7 +78,7 @@ def place_words(words,beat_filename,times):
         try:
             p,t = fft_pow(w)
             emph = t[np.argmax(p)]
-            emph=0
+            #emph=0
             sl = AudioSegment.silent((times[idx]-tidx-emph)*1000)
             waud = AudioSegment.from_wav(WAV_DIR+w+".wav")
         except IOError :

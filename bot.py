@@ -28,7 +28,7 @@ def echo(bot, update):
     WAITING=True
     TYPE='easy'
     if WAITING:
-        if(TYPE=='easy'):
+        if self.last_command == 'easypeasy':
             words = splited_text = update.message.text.lower().split(' ')
             if (len(words)!=5):
                 update.message.reply_text(u"давай пяток слов и между ними пробелы")
