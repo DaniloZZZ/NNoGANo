@@ -63,8 +63,8 @@ class Bot:
 		if text:
 			save_tts(text)
 			effects(text, voice_speed = 1.23)
-			self.beat_file_name = 'beat'+str(random.randrange(1,8))
-			P, t = fft_pow(self.beat_file_name, low_pass=True)
+		self.beat_file_name = 'beat'+str(random.randrange(1,8))
+		P, t = fft_pow(self.beat_file_name, low_pass=True)
 		tms = mark_beats(P, t)
 		place_words(text, self.beat_file_name, tms)
 
