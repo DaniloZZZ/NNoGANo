@@ -95,7 +95,7 @@ def effects(words):
         #cbn.noiseprof('orig'+w+'.wav','noiseprof')
         #cbn.noisered('noizeprof', amount=0.5)
         cbn.tempo(1.2)
-        cbn.loudness(4.0)
+        cbn.loudness(1.0)
         #cbn.convert(samplerate=8000)
         # create the output file
         cbn.build(ORIG_DIR+'orig'+w+'.wav', WAV_DIR+w+'.wav')
