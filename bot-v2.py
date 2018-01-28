@@ -114,6 +114,8 @@ class Bot:
     def work_with_easypeasy(self, text, chat_id):
         if len(text) < 5:
             text += settings.EXTRA_WORDS[:5 - len(text)]
+        else:
+            text = text[:5]
         print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
         new_text = Generate_Rap.main(*text)[:20]
         new_text[:5] = text
