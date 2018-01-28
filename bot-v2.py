@@ -115,7 +115,10 @@ class Bot:
         if len(text) < 5:
             text += settings.EXTRA_WORDS[:5 - len(text)]
         print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
-        text = Generate_Rap.main(*text)[:20]
+        new_text = Generate_Rap.main(*text)[:20]
+        new_text[:5] = text
+        new_text[10:15] = text
+        text = new_text
         print text
         self.GenerateSong(text)
         wavtomp3('result',0,45)
