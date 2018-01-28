@@ -66,7 +66,7 @@ def save_tts(words):
         tts.save(TMP_DIR+w+'.mp3')
         print "got tts result"
 
-def add_adlib(user_id):
+def add_adlib(user_id, loudness = -6.0):
     fil = os.listdir(ADLIB_DIR+str(user_id))[-1]
     print "found %i files for user %i"%(len(files),user_id)
     loop_sample = AudioSegment.empty()
@@ -75,7 +75,7 @@ def add_adlib(user_id):
     num_loops = beat.duration_seconds/(loop_sample.duration_seconds+1)
     print "looping user files %i times"%num_loops
     
-    loop_quiet = loop_sample*int(num_loops )- 7
+    loop_quiet = loop_sample*int(num_loops )+ loudness
     result = beat.overlay(loop_quiet)
     result.export("result.wav", format="wav")
 
