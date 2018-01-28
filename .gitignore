@@ -3,3 +3,4 @@ waves/*
 *.pyc
 temp/*
 origins/*
+result.wav
