@@ -6,10 +6,10 @@ from io import BytesIO
 import logging
 import pickle
 import os
+from urllib2 import urlopen, URLError, HTTPError
 import random
 import Generate_Rap
 from tts import *
-from audio_helper import *
 from get_tts import *
 import settings
 
@@ -23,7 +23,8 @@ class Bot:
     def __init__(self):
         self.last_command = None
         self.waiting = False
-        self.beat_file_name = 'beat'+str(random.randrange(9))
+        self.uploaded_audio = 0
+        self.beat_file_name = 'bfree'
 
         self.logger = logging.getLogger(__name__)
 
@@ -54,41 +55,64 @@ class Bot:
         self.logger.warning('Update "%s" caused error "%s"', update, error)
 
     def text_handler(self, bot, update):
-            chat_id = update.message.chat_id
-            text = update.message.text.lower().split()
-            if self.last_command == 'easypeasy':
-                if len(text) < 5:
-                    text += settings.EXTRA_WORDS[:5 - len(text)]
-                print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
-                #text *= 5
-		self.beat_file_name = 'beat'+str(random.randrange(9))
-                new_text = Generate_Rap.main(*text)
-		new_text[:5] = text
-		new_text[20:25] = text
-		text = new_text
-                save_tts(text)
-                effects(text)
-                words = json.load(open('lyrics.json'))
-                wavs = [w + ".wav" for w in words]
-		self.beat_file_name = 'beat1'
-                P, t = fft_pow(self.beat_file_name, low_pass=True)
-                tms = mark_beats(P, t)
-                place_words(text, self.beat_file_name, tms)
-                print "Created Track."
-                wavtomp3('./result',0,45)
-                message = bot.send_audio(audio=open('result.mp3'),
-                                         chat_id=chat_id)
-                print "DONE"
-            elif self.last_command == 'record':
-                pass
-            elif self.last_command == 'setbro':
-                pass
-            elif self.last_command == 'setmood':
-                pass
-            else:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text=random.choice(settings.NEUTRAL_MESSAGES))
-            self.last_command = None
+        chat_id = update.message.chat_id
+        text = update.message.text.lower().split()
+        if self.last_command == 'easypeasy':
+            message = bot.send_audio(text="Cейчас все будет...",
+                                     chat_id=chat_id)
+
+            self.work_with_easypeasy(text, chat_id)
+
+            message = bot.send_audio(audio=open('result.wav'),
+                                     chat_id=chat_id)
+            print "DONE"
+        elif self.last_command == 'record':
+            message = bot.send_audio(text="Делаем рэп из твоего шедревра...",
+                                     chat_id=chat_id)
+            self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
+            message = bot.send_audio(audio=open('result.wav'),
+                                     chat_id=chat_id)
+        elif self.last_command == 'setbro':
+            pass
+        elif self.last_command == 'setmood':
+            pass
+        else:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text=random.choice(settings.NEUTRAL_MESSAGES))
+        self.last_command = None
+
+    def work_with_easypeasy(self, text, chat_id):
+        if len(text) < 5:
+            text += settings.EXTRA_WORDS[:5 - len(text)]
+        print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
+        text = Generate_Rap.main(*text)
+        save_tts(text)
+        effects(text)
+        words = json.load(open('lyrics.json'))
+        wavs = [w + ".wav" for w in words]
+        self.beat_file_name = 'bfree'
+        P, t = fft_pow(self.beat_file_name, low_pass=True)
+        tms = mark_beats(P, t)
+        place_words(text, self.beat_file_name, tms)
+        print "Created Track."
+
+    def work_with_record(self, voice_path, chat_id):
+        try:
+            link = urlopen(voice_path.file_path)
+            print 'downloading voice'
+            if not os.path.exists(settings.ADLIB_DIR + str(chat_id)):
+                os.makedirs(settings.ADLIB_DIR + str(chat_id))
+            with open(os.path.basename(settings.ADLIB_DIR + str(chat_id) +
+                                               '/' + str(self.uploaded_audio) + '.ogg'), 'wb') as local_file:
+                local_file.write(link.read())
+                '''
+                add_addlib(chat_id)
+                '''
+
+        except:
+            print "Can not download user's voice message"
+
+        #
 
     def record(self, bot, update):
         self.last_command = 'record'
