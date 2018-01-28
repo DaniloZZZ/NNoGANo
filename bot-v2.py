@@ -117,9 +117,10 @@ class Bot:
         else:
             text = text[:5]
         print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
-        new_text = Generate_Rap.main(*text)[:20]
+        new_text = Generate_Rap.main(*text)[:35]
         new_text[:5] = text
         new_text[10:15] = text
+        new_text[20:25] = text
         text = new_text
         print text
         self.GenerateSong(text)
