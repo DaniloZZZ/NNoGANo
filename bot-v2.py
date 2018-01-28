@@ -11,7 +11,9 @@ from tts import *
 from get_tts import *
 import settings
 
-TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
+#TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
+TELEGRAM_TOKEN = '521957216:AAFBuP4he_DGOzo9AovExQfExDQ3jJ8W1vA'
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
@@ -41,6 +43,13 @@ class Bot:
         self.dispatcher.add_handler(setbro_handler)
         self.dispatcher.add_handler(easypeasy_handler)
         self.dispatcher.add_handler(help_handler)
+
+        self.dispatcher.add_error_handler(self.error)
+
+        self.updater.start_polling()
+
+    def error(self, bot, update, error):
+        self.logger.warning('Update "%s" caused error "%s"', update, error)
 
     def text_handler(self, bot, update):
         chat_id = update.message.chat_id
@@ -103,3 +112,4 @@ if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf-8')
     bio = BytesIO()
+    bot = Bot()
