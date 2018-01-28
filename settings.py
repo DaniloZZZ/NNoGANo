@@ -4,7 +4,10 @@ TMP_DIR='./temp/'
 WAV_DIR='./waves/'
 ADLIB_DIR='./adlib/'
 
-HELP_MESSAGE = 'help message'
+HELP_MESSAGE = u'\\record - запиши свой биток, чувак, мы его вставим в наш\n' \ 
+u'\easypeasy - вводи мне пять слов и я замиксую их на свой вкус, чувак\n' \
+u'\\rapmsg - замиксую твою голосовуху\n' \
+u'\help - покажу тебе, что умею'
 
 EASYPEASY_MESSAGE = u'Отправляй свои словечки, я замиксую йоу!'
 SETBRO_MESSAGE = u'Выбирай бротюню!'
