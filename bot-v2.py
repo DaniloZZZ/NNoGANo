@@ -57,8 +57,9 @@ class Bot:
     def text_handler(self, bot, update):
         chat_id = update.message.chat_id
         text = update.message.text.lower().split()
+        print "received Message:",update.message.text
         if self.last_command == 'easypeasy':
-            message = bot.send_audio(text="Cейчас все будет...",
+            message = bot.send_message(text="Cейчас все будет...",
                                      chat_id=chat_id)
 
             self.work_with_easypeasy(text, chat_id)
@@ -67,7 +68,7 @@ class Bot:
                                      chat_id=chat_id)
             print "DONE"
         elif self.last_command == 'record':
-            message = bot.send_audio(text="Делаем рэп из твоего шедревра...",
+            message = bot.send_message(text="Делаем рэп из твоего шедревра...",
                                      chat_id=chat_id)
             self.work_with_record(bot.getFile(update.message.voice.file_id), chat_id)
             message = bot.send_audio(audio=open('result.wav'),
@@ -85,7 +86,8 @@ class Bot:
         if len(text) < 5:
             text += settings.EXTRA_WORDS[:5 - len(text)]
         print "Opening lyrics file. words: %s,id%i" % (text, chat_id)
-        text = Generate_Rap.main(*text)
+        text = Generate_Rap.main(*text)[:20]
+        print text
         save_tts(text)
         effects(text)
         words = json.load(open('lyrics.json'))
@@ -105,13 +107,10 @@ class Bot:
             with open(os.path.basename(settings.ADLIB_DIR + str(chat_id) +
                                                '/' + str(self.uploaded_audio) + '.ogg'), 'wb') as local_file:
                 local_file.write(link.read())
-                '''
                 add_addlib(chat_id)
-                '''
-
-        except:
+        except Exception as e:
             print "Can not download user's voice message"
-
+            print e
         #
 
     def record(self, bot, update):
