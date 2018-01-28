@@ -4,6 +4,7 @@ from pydub import AudioSegment
 import codecs
 import numpy as np
 import json
+import os
 import sox
 import time
 import sys
@@ -64,6 +65,20 @@ def save_tts(words):
         w = w.replace(' ','%20')
         tts.save(TMP_DIR+w+'.mp3')
         print "got tts result"
+
+def add_adlib(user_id):
+    files = os.listdir(ADLIB_DIR+user_id)
+    print "found %i files for user %i"%(len(files),user_id)
+    loop_sample = AudioSegment.empty()
+    beat = AudioSegment.from_wav("result.wav")
+    for ogg in files:
+        loop_sample+= AudioSegment.from_ogg(ADLIB_DIR+ogg)
+    num_loops = beat.duration_seconds/loop_sample.duration_seconds
+    print "looping user files %i times"%num_loops
+    
+    loop_quiet = loop_sample*num_loops - 4 
+    result = beat.overlay(loop_quiet)
+    result.export("result.wav", format="wav")
 
 def effects(words):
     for w in set(words):

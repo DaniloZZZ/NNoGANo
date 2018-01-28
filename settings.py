@@ -2,6 +2,7 @@
 ORIG_DIR='./origins/'
 TMP_DIR='./temp/'
 WAV_DIR='./waves/'
+ADLIB_DIR='./adlib/'
 
 HELP_MESSAGE = 'help message'
 
